@@ -13,7 +13,7 @@ import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-
+levels = 2
 RANDOM_SEED = 42
 tf.set_random_seed(RANDOM_SEED)
 
@@ -28,13 +28,16 @@ def init_weights(shape):
     return tf.Variable(weights)
 
 
-def forwardProp(X, w_1, w_2, b):
+def forwardProp(X, w, b):
     """
     Forward-propagation.
     IMPORTANT: yhat is not softmax since TensorFlow's softmax_cross_entropy_with_logits() does that internally.
     """
-    h = tf.nn.sigmoid(tf.matmul(X, w_1) + b)  # The \sigma function
-    yhat = tf.matmul(h, w_2)  # The \varphi function
+    h = X
+    for i in range(len(b) - 1):
+        h = tf.nn.sigmoid(tf.matmul(h, w[i]) + b[i]) # The \sigma function
+
+    yhat = tf.matmul(h, w[-1]) + b[-1]  # The \varphi function
     return yhat
 
 
@@ -54,18 +57,23 @@ def main():
     x_size = train_x.shape[1]   # Number of input nodes
     h_size = 256                # Number of hidden nodes
     y_size = train_y.shape[1]   # Number of outcomes 10 digits
+    sizes = [x_size, h_size, h_size, y_size]
 
     # Symbols
     X = tf.placeholder("float", shape=[None, x_size])
     y = tf.placeholder("float", shape=[None, y_size])
 
     # Weight initializations
-    w_1 = init_weights((x_size, h_size))
-    w_2 = init_weights((h_size, y_size))
-    b = tf.Variable(tf.zeros([h_size]))
+    w = []
+    b = []
+    for i in range(levels+1):
+        w_1 = init_weights((sizes[i], sizes[i+1]))
+        w.append(w_1)
+        b_1 = tf.Variable(tf.zeros([sizes[i+1]]))
+        b.append(b_1)
 
     # Forward propagation
-    yhat = forwardProp(X, w_1, w_2, b)
+    yhat = forwardProp(X, w, b)
     predict = tf.argmax(yhat, axis=1)
 
     # Backward propagation
@@ -78,6 +86,7 @@ def main():
     sess.run(init)
 
     for epoch in range(10):
+        print("epoch is: %d" % epoch)
         # Train with each example
         for i in range(len(train_x)):
             sess.run(updates, feed_dict={X: train_x[i: i + 1], y: train_y[i: i + 1]})
