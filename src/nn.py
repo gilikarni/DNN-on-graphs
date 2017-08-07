@@ -6,10 +6,11 @@
 # Similarly, for h * W_2 + b_2
 import tensorflow as tf
 import numpy as np
-from tensorflow.examples.tutorials.mnist import input_data
-from diffusion_maps import create_embedding
 import sys
 import ssl
+import pickle
+import time
+from datetime import datetime
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -20,6 +21,8 @@ tf.set_random_seed(RANDOM_SEED)
 # The MNIST images are always 28x28 pixels.
 IMAGE_SIZE = 28
 IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE
+
+LOG_FILE_NAME = "logs.txt"
 
 
 def init_weights(shape):
@@ -40,24 +43,34 @@ def forwardProp(X, w, b):
     yhat = tf.matmul(h, w[-1]) + b[-1]  # The \varphi function
     return yhat
 
+# Params:
+# 1. train_x
+# 2. train_y
+# 3. test_x
+# 4. test_y
 
 def main():
 
-    mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
-    train_x = mnist.train.images
-    test_x = mnist.test.images
-    train_y = mnist.train.labels
-    test_y = mnist.test.labels
-    
-    if "d" in sys.argv:
-        train_x = create_embedding(train_x)
-        test_x = create_embedding(test_x)
+    if len(sys.argv) < 5:
+        exit("Missing arguments -\n1. train_x\n2. train_y\n3. test_x\n4. test_y")
+    with open(sys.argv[1], 'rb') as p:
+        train_x = pickle.load(p)
+    with open(sys.argv[2], 'rb') as p:
+        train_y = pickle.load(p)
+    with open(sys.argv[3], 'rb') as p:
+        test_x = pickle.load(p)
+    with open(sys.argv[4], 'rb') as p:
+        test_y = pickle.load(p)
+
+    logs = open(LOG_FILE_NAME, "a+")
 
     # Layer's sizes
     x_size = train_x.shape[1]   # Number of input nodes
     h_size = 256                # Number of hidden nodes
     y_size = train_y.shape[1]   # Number of outcomes 10 digits
     sizes = [x_size, h_size, h_size, y_size]
+
+    logs.write("%s: Start session with hidden layer of %d neurons.\n" % (datetime.now(), h_size))
 
     # Symbols
     X = tf.placeholder("float", shape=[None, x_size])
@@ -85,7 +98,7 @@ def main():
     init = tf.global_variables_initializer()
     sess.run(init)
 
-    for epoch in range(10):
+    for epoch in range(1):
         print("epoch is: %d" % epoch)
         # Train with each example
         for i in range(len(train_x)):
@@ -93,9 +106,12 @@ def main():
 
     test_accuracy = np.mean(np.argmax(test_y, axis=1) == sess.run(predict, feed_dict={X: test_x, y: test_y}))
 
-    print("Test accuracy = %.2f%%" % (100. * test_accuracy))
+    logs.write("%s: Test accuracy = %.2f%%\n" % (datetime.now(), 100. * test_accuracy))
 
     sess.close()
+
+    logs.write("\n")
+    logs.close()
 
 if __name__ == '__main__':
     main()
