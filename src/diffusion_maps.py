@@ -13,22 +13,20 @@ LOG_FILE_NAME = "logs.txt"
 
 
 def dist_between_vectors(vector_a, vector_b):
-    return np.exp(-1 * (spatial.distance.euclidean(vector_a, vector_b)))
+    return spatial.distance.euclidean(vector_a, vector_b)
 
 
 def create_markov_matrix(x):
-    P = []
-    i = 0
+    D = []
     for vector_a in x:
         dist = []
-        if 0 == (i % 100):
-            print("i = %d" % i)
-        i += 1
         for vector_b in x:
             dist.append(dist_between_vectors(vector_a, vector_b))
-        sum_of_dist = sum(dist)
-        dist = [x/sum_of_dist for x in dist]
-        P.append(dist)
+        D.append(dist)
+
+    D = [[dist_between_vectors(vector_a, vector_b) for vector_b in x] for vector_a in x]
+    sigma = np.median(D)
+    P = [[np.exp((-1) * (p/sigma)) for p in v] for v in D]
     return np.array(P)
 
 
@@ -61,7 +59,10 @@ def create_embedding():
     logs.write("%s: Calculated the eigen values successfully.\n" % (datetime.now()))
 
     for i in range(len(eigen_values)):
-        embedding.append(mul(eigen_vectors[i], eigen_values[i]))
+        phi = []
+        for j in range(len(eigen_values)):
+            phi.append(eigen_values[i] * eigen_vectors[i][j])
+        embedding.append(phi)
 
     logs.write("%s: Created the Embedding matrix successfully.\n" % (datetime.now()))
 
