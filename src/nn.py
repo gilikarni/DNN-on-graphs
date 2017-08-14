@@ -51,16 +51,24 @@ def forwardProp(X, w, b):
 
 def main():
 
-    if len(sys.argv) < 5:
-        exit("Missing arguments -\n1. train_x\n2. train_y\n3. test_x\n4. test_y")
+    if len(sys.argv) < 3:
+        exit("Missing arguments -\n1. train_x\n2. train_y")
     with open(sys.argv[1], 'rb') as p:
-        train_x = pickle.load(p)
+        x = pickle.load(p)
     with open(sys.argv[2], 'rb') as p:
-        train_y = pickle.load(p)
-    with open(sys.argv[3], 'rb') as p:
-        test_x = pickle.load(p)
-    with open(sys.argv[4], 'rb') as p:
-        test_y = pickle.load(p)
+        y = pickle.load(p)
+
+    matrixesx = np.split(x, [8000])
+    matrixesy = np.split(y, [8000])
+    train_x = matrixesx[0]
+    test_x = matrixesx[1]
+    train_y = matrixesy[0]
+    test_y = matrixesy[1]
+
+    #with open(sys.argv[3], 'rb') as p:
+    #test_x = pickle.load(p)
+    #with open(sys.argv[4], 'rb') as p:
+    #   test_y = pickle.load(p)
 
     logs = open(LOG_FILE_NAME, "a+")
 
@@ -98,7 +106,7 @@ def main():
     init = tf.global_variables_initializer()
     sess.run(init)
 
-    for epoch in range(1):
+    for epoch in range(10):
         print("epoch is: %d" % epoch)
         # Train with each example
         for i in range(len(train_x)):

@@ -70,6 +70,7 @@ def create_embedding():
 
     logs.write("%s: Created the file %s with the Embedding matrix successfully.\n" % (datetime.now(), sys.argv[2]))
 
+    logs.write("\n")
     logs.close()
 
 
