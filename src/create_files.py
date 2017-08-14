@@ -6,13 +6,16 @@ import sys
 import ssl
 import pickle
 
+train_size = 10000
+test_size = 2000
+
 
 def main():
     mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
-    train_x = mnist.train.images
-    test_x = mnist.test.images
-    train_y = mnist.train.labels
-    test_y = mnist.test.labels
+    train_x = np.delete(mnist.train.images, np.s_[train_size:], 0)
+    test_x = np.delete(mnist.test.images, np.s_[test_size:], 0)
+    train_y = np.delete(mnist.train.labels, np.s_[train_size:], 0)
+    test_y = np.delete(mnist.test.labels, np.s_[test_size:], 0)
     with open('train_x.pkl', 'wb') as p:
         pickle.dump(train_x, p, pickle.HIGHEST_PROTOCOL)
     with open('train_y.pkl', 'wb') as p:
@@ -21,15 +24,6 @@ def main():
         pickle.dump(test_x, p, pickle.HIGHEST_PROTOCOL)
     with open('test_y.pkl', 'wb') as p:
         pickle.dump(test_y, p, pickle.HIGHEST_PROTOCOL)
-
-
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
     main()
