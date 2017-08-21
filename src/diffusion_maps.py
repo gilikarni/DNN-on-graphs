@@ -17,13 +17,6 @@ def dist_between_vectors(vector_a, vector_b):
 
 
 def create_markov_matrix(x):
-    D = []
-    for vector_a in x:
-        dist = []
-        for vector_b in x:
-            dist.append(dist_between_vectors(vector_a, vector_b))
-        D.append(dist)
-
     D = [[dist_between_vectors(vector_a, vector_b) for vector_b in x] for vector_a in x]
     sigma = np.median(D)
     P = [[np.exp((-1) * (p/sigma)) for p in v] for v in D]
@@ -60,6 +53,8 @@ def create_embedding():
 
     for i in range(len(eigen_values)):
         phi = []
+        if i%100 == 0:
+            print(i)
         for j in range(len(eigen_values)):
             phi.append(eigen_values[i] * eigen_vectors[i][j])
         embedding.append(phi)
