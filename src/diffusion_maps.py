@@ -20,6 +20,9 @@ def create_markov_matrix(x):
     D = [[dist_between_vectors(vector_a, vector_b) for vector_b in x] for vector_a in x]
     sigma = np.median(D)
     P = [[np.exp((-1) * (p/sigma)) for p in v] for v in D]
+    for idx, row in enumerate(P):
+        s = sum(row)
+        P[idx] = [element/s for element in row]
     return np.array(P)
 
 
@@ -55,15 +58,28 @@ def create_embedding():
     for i in range(len(eigen_values)):
         phi = []
         for j in range(len(eigen_values)):
-            phi.append(pow(eigen_values[i], sys.argv[3]) * eigen_vectors[i][j])
+            phi.append(pow(eigen_values[i], int(sys.argv[3])) * eigen_vectors[i][j])
         embedding.append(phi)
 
     logs.write("%s: Created the Embedding matrix successfully.\n" % (datetime.now()))
 
-    with open(sys.argv[2], 'wb') as p:
-        pickle.dump(np.array(embedding), p, pickle.HIGHEST_PROTOCOL)
+    # Normalize the matrix to [-1,1]
+    embedding_arr = np.array(embedding)
+    maximum = np.amax(embedding_arr)
+    minimum = np.amin(embedding_arr)
 
-    logs.write("%s: Created the file %s with the Embedding matrix successfully.\n" % (datetime.now(), sys.argv[2]))
+    embedding_arr = np.array([[((cell - minimum)*(2/(maximum - minimum)) - 1) for cell in row] for row in embedding])
+
+    logs.write("%s: Normalized the Embedding matrix to the range [-1,1]."
+               " Old maximum value = %f, old minimum value = %f. "
+               "New maximum = %f, new minimum %f\n"
+               % (datetime.now(), maximum, minimum, np.amax(embedding_arr), np.amin(embedding_arr)))
+
+    with open(sys.argv[2], 'wb') as p:
+        pickle.dump(embedding_arr, p, pickle.HIGHEST_PROTOCOL)
+
+    logs.write("%s: Created the file %s with the Embedding matrix successfully.\n"
+               % (datetime.now(), sys.argv[2]))
 
     logs.write("\n")
     logs.close()

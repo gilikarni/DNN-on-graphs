@@ -57,9 +57,9 @@ def main():
         x = pickle.load(p)
     with open(sys.argv[2], 'rb') as p:
         y = pickle.load(p)
-
-    matrixesx = np.split(x, [8000])
-    matrixesy = np.split(y, [8000])
+    len_x = len(x)
+    matrixesx = np.split(x, [int(0.8*len_x)])
+    matrixesy = np.split(y, [int(0.8*len_x)])
     train_x = matrixesx[0]
     test_x = matrixesx[1]
     train_y = matrixesy[0]
@@ -107,7 +107,6 @@ def main():
     sess.run(init)
 
     for epoch in range(10):
-        print("epoch is: %d" % epoch)
         # Train with each example
         for i in range(len(train_x)):
             sess.run(updates, feed_dict={X: train_x[i: i + 1], y: train_y[i: i + 1]})
