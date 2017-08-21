@@ -29,11 +29,12 @@ def mul(vector, num):
 # Args:
 # 1. Name of input file
 # 2. Name of output file
+# 3. t = The length of the paths
 
 
 def create_embedding():
 
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 4:
         exit("Missing arguments")
 
     logs = open(LOG_FILE_NAME, "a+")
@@ -41,7 +42,7 @@ def create_embedding():
     with open(sys.argv[1], 'rb') as p:
         x = pickle.load(p)
 
-    logs.write("%s: Start creating the embadding for %s, opened the file successfully.\n" % (datetime.now(), sys.argv[1]))
+    logs.write("%s: Start creating the embedding for %s, opened the file successfully.\n" % (datetime.now(), sys.argv[1]))
 
     P = create_markov_matrix(x)
 
@@ -53,10 +54,8 @@ def create_embedding():
 
     for i in range(len(eigen_values)):
         phi = []
-        if i%100 == 0:
-            print(i)
         for j in range(len(eigen_values)):
-            phi.append(eigen_values[i] * eigen_vectors[i][j])
+            phi.append(pow(eigen_values[i], sys.argv[3]) * eigen_vectors[i][j])
         embedding.append(phi)
 
     logs.write("%s: Created the Embedding matrix successfully.\n" % (datetime.now()))
