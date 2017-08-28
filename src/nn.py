@@ -106,7 +106,7 @@ def main():
     init = tf.global_variables_initializer()
     sess.run(init)
 
-    for epoch in range(10):
+    for epoch in range(10000):
         # Train with each example
         for i in range(len(train_x)):
             sess.run(updates, feed_dict={X: train_x[i: i + 1], y: train_y[i: i + 1]})

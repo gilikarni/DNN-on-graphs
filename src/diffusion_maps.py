@@ -54,9 +54,13 @@ def create_embedding():
     logs.write("%s: Created the Markov matrix successfully.\n" % (datetime.now()))
     eigen_values, eigen_vectors = linalg.eig(P)
     plt.plot(eigen_values)
-
-    savefig('eigen_values Graph ' + datetime.now().strftime('%Y_%m_%d  %H_%M') + '.pdf')
-    savefig('eigen_values Graph ' + datetime.now().strftime('%Y_%m_%d  %H_%M') + '.jpg')
+    plt.xlim(0, 1000)
+    fig = plt.gcf()
+    plt.show()
+    fig.savefig('eigen_values Graph ' + datetime.now().strftime('%Y_%m_%d  %H_%M') + '.pdf')
+    fig.savefig('eigen_values Graph ' + datetime.now().strftime('%Y_%m_%d  %H_%M') + '.jpg')
+    eigen_values = eigen_values[:100]
+    eigen_vectors = eigen_vectors[:100]
     embedding = []
 
     logs.write("%s: Calculated the eigen values successfully.\n" % (datetime.now()))
