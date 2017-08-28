@@ -1,10 +1,12 @@
 from datetime import datetime
 
+from matplotlib.pyplot import savefig
 from scipy import spatial
 from numpy import linalg
 import sys
 import pickle
 import numpy as np
+import matplotlib.pyplot as plt
 
 # The MNIST images are always 28x28 pixels.
 IMAGE_SIZE = 28
@@ -51,6 +53,10 @@ def create_embedding():
 
     logs.write("%s: Created the Markov matrix successfully.\n" % (datetime.now()))
     eigen_values, eigen_vectors = linalg.eig(P)
+    plt.plot(eigen_values)
+
+    savefig('eigen_values Graph ' + datetime.now().strftime('%Y_%m_%d  %H_%M') + '.pdf')
+    savefig('eigen_values Graph ' + datetime.now().strftime('%Y_%m_%d  %H_%M') + '.jpg')
     embedding = []
 
     logs.write("%s: Calculated the eigen values successfully.\n" % (datetime.now()))
@@ -62,6 +68,7 @@ def create_embedding():
         embedding.append(phi)
 
     logs.write("%s: Created the Embedding matrix successfully.\n" % (datetime.now()))
+
 
     # Normalize the matrix to [-1,1]
     embedding_arr = np.array(embedding)
