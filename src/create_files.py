@@ -6,7 +6,7 @@ import sys
 import ssl
 import pickle
 
-train_size = 10000
+train_size = 1000
 test_size = 2000
 
 

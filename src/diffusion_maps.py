@@ -36,7 +36,6 @@ def mul(vector, num):
 # 2. Name of output file
 # 3. t = The length of the paths
 
-
 def create_embedding():
 
     if len(sys.argv) < 4:
@@ -59,8 +58,8 @@ def create_embedding():
     plt.show()
     fig.savefig('eigen_values Graph ' + datetime.now().strftime('%Y_%m_%d  %H_%M') + '.pdf')
     fig.savefig('eigen_values Graph ' + datetime.now().strftime('%Y_%m_%d  %H_%M') + '.jpg')
-    eigen_values = eigen_values[:100]
-    eigen_vectors = eigen_vectors[:100]
+    # eigen_values = eigen_values[:1000]
+    # eigen_vectors = eigen_vectors[:1000]
     embedding = []
 
     logs.write("%s: Calculated the eigen values successfully.\n" % (datetime.now()))

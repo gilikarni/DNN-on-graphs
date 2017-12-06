@@ -46,8 +46,6 @@ def forwardProp(X, w, b):
 # Params:
 # 1. train_x
 # 2. train_y
-# 3. test_x
-# 4. test_y
 
 def main():
 
@@ -57,13 +55,13 @@ def main():
         x = pickle.load(p)
     with open(sys.argv[2], 'rb') as p:
         y = pickle.load(p)
-    len_x = len(x)
+    len_x = x.size
     matrixesx = np.split(x, [int(0.8*len_x)])
     matrixesy = np.split(y, [int(0.8*len_x)])
     train_x = matrixesx[0]
-    test_x = matrixesx[1]
+    test_x = matrixesx[0]
     train_y = matrixesy[0]
-    test_y = matrixesy[1]
+    test_y = matrixesy[0]
 
     #with open(sys.argv[3], 'rb') as p:
     #test_x = pickle.load(p)
@@ -97,6 +95,8 @@ def main():
     yhat = forwardProp(X, w, b)
     predict = tf.argmax(yhat, axis=1)
 
+
+
     # Backward propagation
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=yhat))
     updates = tf.train.GradientDescentOptimizer(0.01).minimize(cost)
@@ -106,11 +106,19 @@ def main():
     init = tf.global_variables_initializer()
     sess.run(init)
 
-    for epoch in range(10000):
+    for epoch in range(1000):
         # Train with each example
         for i in range(len(train_x)):
             sess.run(updates, feed_dict={X: train_x[i: i + 1], y: train_y[i: i + 1]})
 
+    # Print w:
+    wfile_embedding = open('wfile_diffusion.text', 'w+')
+    for i in range(len(w)):
+        wfile_embedding.write("w: {}: \n".format(i))
+        for j in range(len(i)):
+            wfile_embedding.write("{} ".format(w[i][j]))
+        wfile_embedding.write("\n")
+    wfile_embedding.close()
     test_accuracy = np.mean(np.argmax(test_y, axis=1) == sess.run(predict, feed_dict={X: test_x, y: test_y}))
 
     logs.write("%s: Test accuracy = %.2f%%\n" % (datetime.now(), 100. * test_accuracy))
